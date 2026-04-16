@@ -164,6 +164,13 @@ class TestProductRoutes(TestCase):
         response = self.client.post(BASE_URL, data={}, content_type="plain/text")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_create_product_wrong_endpoint(self):
+        """It should not Create a Product with endpoint to specific id"""
+        test_product = ProductFactory()
+        logging.debug("Test Product: %s", test_product.serialize())
+        response = self.client.post((f"{BASE_URL}/1"), json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
@@ -225,7 +232,7 @@ class TestProductRoutes(TestCase):
         found_count = len(found)
         logging.debug("Found Products [%d] %s", found_count, found)
 
-        # test for available
+        # test for category
         response = self.client.get(BASE_URL, query_string=f"category={category.name}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
